@@ -1,0 +1,19 @@
+{
+  "name": "com.caseydecoder.doxygengenerator",
+  "version": "1.0.0",
+  "displayName": "Doxygen Generator",
+  "keywords": [
+    "Doxygen",
+    "Generator",
+    "CaseyDeCoder",
+    "Casey",
+    "Coder",
+    "DeCoder"
+  ],
+  "author": {
+    "name": "CaseyDeCoder",
+    "email": "hofland.casey@gmail.com",
+    "url": "https://casey-says-hello.surge.sh/"
+  },
+  "hideInEditor": false
+}
