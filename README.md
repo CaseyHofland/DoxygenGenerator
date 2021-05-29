@@ -1,5 +1,5 @@
 # DoxygenGenerator
-A quick way to generate API documentation from inside Unity using [doxygen](https://www.doxygen.nl/index.html), with [doxygen-awesome](https://github.com/jothepro/doxygen-awesome-css) styling. Useful for generating API of your custom packages.
+A quick way to generate API documentation from inside Unity using [doxygen](https://www.doxygen.nl/index.html), with [doxygen-awesome](https://github.com/jothepro/doxygen-awesome-css) styling. Useful for generating API of your custom packages. Special thanks to [JacobPennock](https://forum.unity.com/members/jacobpennock.53178/) for the original implementation and [Brogrammar](https://forum.unity.com/members/brogrammar.1045220/) for an updated version that works with more modern versions of Unity.
 
 Watch [this tutorial](https://youtu.be/ltJgXJjS_YQ) to get started.
 
