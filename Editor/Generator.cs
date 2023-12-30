@@ -9,6 +9,7 @@ namespace DoxygenGenerator
     public static class Generator
     {
         private const string filesPath = "Packages/com.CaseyDeCoder.doxygengenerator/Editor/Files~";
+        private const string collabPath = "Assets/Plugins/DoxygenGenerator/Editor/Files~";
 
         public static Thread GenerateAsync()
         {
@@ -20,19 +21,20 @@ namespace DoxygenGenerator
             var synopsis = GeneratorSettings.synopsis;
             var version = GeneratorSettings.version;
 
+            bool collabMode = !File.Exists(filesPath);//For those that want to collab like Dencho
             // Add the Doxyfile
-            var doxyFileSource = $"{filesPath}/Doxyfile";
+            var doxyFileSource = $"{(collabMode ? collabPath : filesPath)}/Doxyfile";
             var doxyFileDestination = $"{outputDirectory}/Doxyfile";
             File.Copy(doxyFileSource, doxyFileDestination, true);
             
             // Add doxygen-awesome
             Directory.CreateDirectory($"{outputDirectory}/html");
 
-            var doxygenAwesomeSource = $"{filesPath}/doxygen-awesome.css";
+            var doxygenAwesomeSource = $"{(collabMode ? collabPath : filesPath)}/doxygen-awesome.css";
             var doxygenAwesomeDestination = $"{outputDirectory}/html/doxygen-awesome.css";
             File.Copy(doxygenAwesomeSource, doxygenAwesomeDestination, true);
 
-            var doxygenAwesomeSidebarOnlySource = $"{filesPath}/doxygen-awesome-sidebar-only.css";
+            var doxygenAwesomeSidebarOnlySource = $"{(collabMode ? collabPath : filesPath)}/doxygen-awesome-sidebar-only.css";
             var doxygenAwesomeSidebarOnlyDestination = $"{outputDirectory}/html/doxygen-awesome-sidebar-only.css";
             File.Copy(doxygenAwesomeSidebarOnlySource, doxygenAwesomeSidebarOnlyDestination, true);
 
