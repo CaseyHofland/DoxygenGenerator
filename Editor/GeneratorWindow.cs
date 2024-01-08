@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
@@ -10,6 +12,11 @@ namespace DoxygenGenerator
         private Vector2 scrollPosition;
         private Thread doxygenThread;
         private string generateButtonName = "Generate";
+        //MainPage Selector Vars
+        private string setMainPage { get => GeneratorSettings.o_MainPage; set => GeneratorSettings.o_MainPage = value; }
+        private bool isSelectingMainPage = false;
+        private List<string> mainPageCandidates = new List<string>();
+        //Option GUIs
         private GUIContent o_MarkdownSupportLabel;
         private GUIContent o_AlNumSortingLabel;
         private GUIContent o_showReferencedByRelationLabel;
@@ -19,7 +26,7 @@ namespace DoxygenGenerator
         private GUIContent o_showNamespacesLabel;
         private GUIContent o_hideScopeNamesLabel;
         private GUIContent o_hideCompoundRefsLabel;
-        
+        //Styles
         private GUIStyle o_ToggleStyle { get => EditorStyles.toolbarButton; }
 
         private bool canGenerate => File.Exists(doxygenPath)
@@ -67,9 +74,9 @@ namespace DoxygenGenerator
         private bool o_MarkdownSupport
         {
             get => GeneratorSettings.o_MarkdownSupport;
-            set=> GeneratorSettings.o_MarkdownSupport = value;
+            set => GeneratorSettings.o_MarkdownSupport = value;
         }
-        
+
         private bool o_AlNumSorting
         {
             get => GeneratorSettings.o_AlNumSorting;
@@ -127,11 +134,22 @@ namespace DoxygenGenerator
             window.minSize = new Vector2(420, 245);
             window.Show();
         }
+        private void InitGuiContent()
+        {
+            o_MarkdownSupportLabel = new GUIContent("Markdown Support", "Allow Doxygen to read child md files and add them to the generated output");
+            o_AlNumSortingLabel = new GUIContent("AlphaNumeric Sorting", "Should use alphanumeric sorting for all members in classes");
+            o_showReferencedByRelationLabel = new GUIContent("Referenced By Relations", "Toggle to show or hide the list of functions, variables, or classes that reference the current entity in the documentation.");
+            o_showReferencesRelationLabel = new GUIContent("References Relations", "Toggle to display or conceal the list of functions, variables, or classes that the current entity references in the documentation.");
+            o_showUsedFilesLabel = new GUIContent("Show Doc Used Files", "Toggle to include a list of files used by the documented entity at the foot of the document.");
+            o_showFilesLabel = new GUIContent("Show Files", "Toggle to display a list of all the documented files in the heirarchy.");
+            o_showNamespacesLabel = new GUIContent("Show Namespaces", "Toggle to include documentation for all namespaces.");
+            o_hideScopeNamesLabel = new GUIContent("Hide Scope Names", "Toggle to hide scope names in the generated documentation for a cleaner look.");
+            o_hideCompoundRefsLabel = new GUIContent("Hide Compound References", "Toggle to hide references to compound types, like classes or structs, within the documentation.");
+        }
 
         private void OnEnable()
         {
             InitGuiContent();
-            
         }
         private void OnGUI()
         {
@@ -146,22 +164,19 @@ namespace DoxygenGenerator
             // Set your project settings
             ProjectSettingsGUI();
 
-            using(var splitScope = new EditorGUILayout.HorizontalScope())
+            using (var splitScope = new EditorGUILayout.HorizontalScope(GUI.skin.box))
             {
-                using(var leftScope = new EditorGUILayout.VerticalScope(GUI.skin.box, GUILayout.ExpandWidth(true)))
-                {
-                    // Change how the docs output
-                    ContentOptionsGUI();
-                    //EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
-                }
-
-                using(var verticalScope = new EditorGUILayout.VerticalScope(GUILayout.Width((EditorGUIUtility.currentViewWidth * 0.5f))))
+                using (var verticalScope = new EditorGUILayout.VerticalScope( GUILayout.Width((EditorGUIUtility.currentViewWidth * 0.5f))))
                 {
                     // Generate the API
                     DocumentationGUI();
                     EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
                 }
-                
+                using (var leftScope = new EditorGUILayout.VerticalScope(GUILayout.ExpandWidth(true)))
+                {
+                    // Change how the docs output
+                    ContentOptionsGUI();
+                }
             }
 
             EditorGUILayout.EndScrollView();
@@ -250,7 +265,7 @@ namespace DoxygenGenerator
             GUILayout.Label("Documentation", EditorStyles.boldLabel);
 
             // Update the doxygen thread
-            if(doxygenThread != null)
+            if (doxygenThread != null)
             {
                 switch (doxygenThread.ThreadState)
                 {
@@ -289,7 +304,7 @@ namespace DoxygenGenerator
             EditorGUI.EndDisabledGroup();
 
             // Browse Button
-            var browsePath = $"{outputDirectory}/html/annotated.html";
+            var browsePath = $"{outputDirectory}/docs/annotated.html";
             EditorGUI.BeginDisabledGroup(!File.Exists(browsePath) || doxygenThread != null);
             if (GUILayout.Button("Browse", GUILayout.Height(EditorGUIUtility.singleLineHeight * 2)))
             {
@@ -297,29 +312,19 @@ namespace DoxygenGenerator
             }
             EditorGUI.EndDisabledGroup();
         }
-
-        private void InitGuiContent()
-        {
-            o_MarkdownSupportLabel = new GUIContent("Markdown Support", "Allow Doxygen to read child md files and add them to the generated output");
-            o_AlNumSortingLabel = new GUIContent("AlphaNumeric Sorting", "Should use alphanumeric sorting for all members in classes");
-            o_showReferencedByRelationLabel = new GUIContent("Referenced By Relations", "Toggle to show or hide the list of functions, variables, or classes that reference the current entity in the documentation.");
-            o_showReferencesRelationLabel = new GUIContent("References Relations", "Toggle to display or conceal the list of functions, variables, or classes that the current entity references in the documentation.");
-            o_showUsedFilesLabel = new GUIContent("Show Doc Used Files", "Toggle to include a list of files used by the documented entity at the foot of the document.");
-            o_showFilesLabel = new GUIContent("Show Files", "Toggle to display a list of all the documented files in the heirarchy.");
-            o_showNamespacesLabel = new GUIContent("Show Namespaces", "Toggle to include documentation for all namespaces.");
-            o_hideScopeNamesLabel = new GUIContent("Hide Scope Names", "Toggle to hide scope names in the generated documentation for a cleaner look.");
-            o_hideCompoundRefsLabel = new GUIContent("Hide Compound References", "Toggle to hide references to compound types, like classes or structs, within the documentation.");
-        }
-
+        
         private void ContentOptionsGUI()
         {
+            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
+
+            GUILayout.Label("Options", EditorStyles.boldLabel);
             o_MarkdownSupport = EditorGUILayout.ToggleLeft(o_MarkdownSupportLabel, o_MarkdownSupport, o_ToggleStyle);
             o_AlNumSorting = EditorGUILayout.ToggleLeft(o_AlNumSortingLabel, o_AlNumSorting, o_ToggleStyle);
-            o_ShowReferencedByRelation = EditorGUILayout.ToggleLeft(o_showReferencedByRelationLabel, o_ShowReferencedByRelation, o_ToggleStyle);
-            o_ShowReferencesRelation = EditorGUILayout.ToggleLeft(o_showReferencesRelationLabel, o_ShowReferencesRelation, o_ToggleStyle);
-            o_ShowUsedFiles = EditorGUILayout.ToggleLeft(o_showUsedFilesLabel, o_ShowUsedFiles, o_ToggleStyle);
             o_ShowFiles = EditorGUILayout.ToggleLeft(o_showFilesLabel, o_ShowFiles, o_ToggleStyle);
             o_ShowNamespaces = EditorGUILayout.ToggleLeft(o_showNamespacesLabel, o_ShowNamespaces, o_ToggleStyle);
+            o_ShowUsedFiles = EditorGUILayout.ToggleLeft(o_showUsedFilesLabel, o_ShowUsedFiles, o_ToggleStyle);
+            o_ShowReferencedByRelation = EditorGUILayout.ToggleLeft(o_showReferencedByRelationLabel, o_ShowReferencedByRelation, o_ToggleStyle);
+            o_ShowReferencesRelation = EditorGUILayout.ToggleLeft(o_showReferencesRelationLabel, o_ShowReferencesRelation, o_ToggleStyle);
             o_HideScopeNames = EditorGUILayout.ToggleLeft(o_hideScopeNamesLabel, o_HideScopeNames, o_ToggleStyle);
             o_HideCompoundReference = EditorGUILayout.ToggleLeft(o_hideCompoundRefsLabel, o_HideCompoundReference, o_ToggleStyle);
         }

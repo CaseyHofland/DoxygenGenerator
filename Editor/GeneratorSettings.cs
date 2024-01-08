@@ -93,5 +93,11 @@ namespace DoxygenGenerator
             get => EditorPrefs.GetBool($"{nameof(DoxygenGenerator)}.{nameof(GeneratorSettings)}.{nameof(o_HideCompoundRefs)}", false);
             set => EditorPrefs.SetBool($"{nameof(DoxygenGenerator)}.{nameof(GeneratorSettings)}.{nameof(o_HideCompoundRefs)}", value);
         }
+
+        public static string o_MainPage
+        {
+            get => EditorPrefs.GetString($"{nameof(DoxygenGenerator)}.{nameof(GeneratorSettings)}.{nameof(o_MainPage)}", string.Empty);
+            set => EditorPrefs.SetString($"{nameof(DoxygenGenerator)}.{nameof(GeneratorSettings)}.{nameof(o_MainPage)}", value);
+        }
     }
 }

@@ -31,6 +31,7 @@ namespace DoxygenGenerator
             var showNamespaces = GeneratorSettings.o_ShowNamespaces;
             var hideScopeNames = GeneratorSettings.o_HideScopeNames;
             var hideCompoundReference = GeneratorSettings.o_HideCompoundRefs;
+            var mainPagePath = GeneratorSettings.o_MainPage;
             bool collabMode = !File.Exists(filesPath);//For those that want to collab like Dencho
             // Add the Doxyfile
             var doxyPath = (collabMode ? collabPath : filesPath);
@@ -38,46 +39,46 @@ namespace DoxygenGenerator
             var doxyFileDestination = $"{outputDirectory}/Doxyfile";
             File.Copy(doxyFileSource, doxyFileDestination, true);
             // Add doxygen-awesome
-            Directory.CreateDirectory($"{outputDirectory}/html");
+            Directory.CreateDirectory($"{outputDirectory}/docs");
             //1 - JS Files
             var doxygenJSSource_DarkModeToggle = $"{doxyPath}/doxygen-awesome-darkmode-toggle.js";
-            var doxygenJSDestination_DarkModeToggle = $"{outputDirectory}/html/doxygen-awesome-darkmode-toggle.js";
+            var doxygenJSDestination_DarkModeToggle = $"{outputDirectory}/docs/doxygen-awesome-darkmode-toggle.js";
             File.Copy(doxygenJSSource_DarkModeToggle, doxygenJSDestination_DarkModeToggle, true);
             //2
             var doxygenJSSource_FragmentCopy = $"{doxyPath}/doxygen-awesome-fragment-copy-button.js";
-            var doxygenJSDesination_FragmentCopy = $"{outputDirectory}/html/doxygen-awesome-fragment-copy-button.js";
+            var doxygenJSDesination_FragmentCopy = $"{outputDirectory}/docs/doxygen-awesome-fragment-copy-button.js";
             File.Copy(doxygenJSSource_FragmentCopy, doxygenJSDesination_FragmentCopy, true);
             //3
             var doxygenJSSource_ParagraphLink = $"{doxyPath}/doxygen-awesome-paragraph-link.js";
-            var doxygenJSDesination_ParagraphLink = $"{outputDirectory}/html/doxygen-awesome-paragraph-link.js";
+            var doxygenJSDesination_ParagraphLink = $"{outputDirectory}/docs/doxygen-awesome-paragraph-link.js";
             File.Copy(doxygenJSSource_ParagraphLink, doxygenJSDesination_ParagraphLink, true);
             //4
             var doxygenJSSource_InteractiveToC = $"{doxyPath}/doxygen-awesome-interactive-toc.js";
-            var doxygenJSDesination_InteractiveToC = $"{outputDirectory}/html/doxygen-awesome-interactive-toc.js";
+            var doxygenJSDesination_InteractiveToC = $"{outputDirectory}/docs/doxygen-awesome-interactive-toc.js";
             File.Copy(doxygenJSSource_InteractiveToC, doxygenJSDesination_InteractiveToC, true);
             //5
             var doxygenJSSource_Tabs = $"{doxyPath}/doxygen-awesome-tabs.js";
-            var doxygenJSDesination_Tabs = $"{outputDirectory}/html/doxygen-awesome-tabs.js";
+            var doxygenJSDesination_Tabs = $"{outputDirectory}/docs/doxygen-awesome-tabs.js";
             File.Copy(doxygenJSSource_Tabs, doxygenJSDesination_Tabs, true);
             //1 - CSS FIles
             var doxygenCSSSource_Awesome = $"{doxyPath}/doxygen-awesome.css";
-            var doxygenCSSDestination_Awesome = $"{outputDirectory}/html/doxygen-awesome.css";
+            var doxygenCSSDestination_Awesome = $"{outputDirectory}/docs/doxygen-awesome.css";
             File.Copy(doxygenCSSSource_Awesome, doxygenCSSDestination_Awesome, true);
             //2
             var doxygenCSSSource_Custom = $"{doxyPath}/doxygen-custom.css";
-            var doxygenCSSDestination_Custom = $"{outputDirectory}/html/doxygen-custom.css";
+            var doxygenCSSDestination_Custom = $"{outputDirectory}/docs/doxygen-custom.css";
             File.Copy(doxygenCSSSource_Custom, doxygenCSSDestination_Custom, true);
             //3
             var doxygenCSSSource_SidebarOnly = $"{doxyPath}/doxygen-awesome-sidebar-only.css";
-            var doxygenCSSDestination_SidebarOnly = $"{outputDirectory}/html/doxygen-awesome-sidebar-only.css";
+            var doxygenCSSDestination_SidebarOnly = $"{outputDirectory}/docs/doxygen-awesome-sidebar-only.css";
             File.Copy(doxygenCSSSource_SidebarOnly, doxygenCSSDestination_SidebarOnly, true);
             //4
             var doxygenCSSSource_SideBarOnlyDarkModeToggle = $"{doxyPath}/doxygen-awesome-sidebar-only-darkmode-toggle.css";
-            var doxygenCSSDestination_SideBarOnlyDarkModeToggle = $"{outputDirectory}/html/doxygen-awesome-sidebar-only-darkmode-toggle.css";
+            var doxygenCSSDestination_SideBarOnlyDarkModeToggle = $"{outputDirectory}/docs/doxygen-awesome-sidebar-only-darkmode-toggle.css";
             File.Copy(doxygenCSSSource_SideBarOnlyDarkModeToggle, doxygenCSSDestination_SideBarOnlyDarkModeToggle, true);
             //Header
             var customHeaderSource = $"{doxyPath}/header.html";
-            var customHeaderDestination = $"{outputDirectory}/html/header.html";
+            var customHeaderDestination = $"{outputDirectory}/docs/header.html";
             File.Copy(customHeaderSource, customHeaderDestination, true);
             
             // Update Doxyfile parameters
@@ -89,6 +90,8 @@ namespace DoxygenGenerator
             doxyFileStringBuilder = doxyFileStringBuilder.Replace("PROJECT_NUMBER         =", $"PROJECT_NUMBER         = {version}");
             doxyFileStringBuilder = doxyFileStringBuilder.Replace("INPUT                  =", $"INPUT                  = \"{inputDirectory}\"");
             doxyFileStringBuilder = doxyFileStringBuilder.Replace("OUTPUT_DIRECTORY       =", $"OUTPUT_DIRECTORY       = \"{outputDirectory}\"");
+            //Set Main Page
+            //doxyFileStringBuilder = doxyFileStringBuilder.Replace("USE_MDFILE_AS_MAINPAGE = ", string.Format("USE_MDFILE_AS_MAINPAGE = {0}", mainPagePath));
             //Custom Header
             doxyFileStringBuilder = doxyFileStringBuilder.Replace("HTML_HEADER            =",string.Format("HTML_HEADER            = {0}", customHeaderDestination));
             //JS string

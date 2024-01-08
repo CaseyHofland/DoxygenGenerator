@@ -186,8 +186,8 @@ IMAGE_PATH             = ../img/
 INPUT_FILTER           =
 FILTER_PATTERNS        =
 FILTER_SOURCE_FILES    = NO
-FILTER_SOURCE_PATTERNS =
-USE_MDFILE_AS_MAINPAGE = README.md
+FILTER_SOURCE_PATTERNS = 
+USE_MDFILE_AS_MAINPAGE = 
 FORTRAN_COMMENT_AFTER  = 72
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -214,7 +214,7 @@ IGNORE_PREFIX          =
 # Configuration options related to the HTML output
 #---------------------------------------------------------------------------
 GENERATE_HTML          = YES
-HTML_OUTPUT            = html
+HTML_OUTPUT            = docs
 HTML_FILE_EXTENSION    = .html
 HTML_HEADER            = 
 HTML_FOOTER            =
